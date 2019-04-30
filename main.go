@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 	"time"
 
@@ -54,7 +56,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		// Set the CSRF cookie
 		http.SetCookie(w, fw.MakeCSRFCookie(r, nonce))
-		logger.Debug("Set CSRF cookie and redirecting to google login")
+		logger.Debug("Set CSRF cookie and redirecting to oidc login")
 
 		// Forward them on
 		http.Redirect(w, r, fw.GetLoginURL(r, nonce), http.StatusTemporaryRedirect)
@@ -86,7 +88,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-// Authenticate user after they have come back from google
+// Authenticate user after they have come back from oidc
 func handleCallback(w http.ResponseWriter, r *http.Request, qs url.Values,
 	logger logrus.FieldLogger) {
 	// Check for CSRF cookie
@@ -137,6 +139,26 @@ func handleCallback(w http.ResponseWriter, r *http.Request, qs url.Values,
 	http.Redirect(w, r, redirect, http.StatusTemporaryRedirect)
 }
 
+func getOidcConfig(oidc string) map[string]interface{} {
+	uri, err := url.Parse(oidc)
+	if err != nil {
+		log.Fatal("failed to parse oidc string")
+	}
+	uri.Path = path.Join(uri.Path, "/.well-known/openid-configuration")
+	res, err := http.Get(uri.String())
+	if err != nil {
+		log.Fatal("failed to get oidc parametere from oidc connect")
+	}
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal("failed to read response body")
+	}
+	var result map[string]interface{}
+	json.Unmarshal(body, &result)
+	log.Debug(result)
+	return result
+}
+
 // Main
 func main() {
 	// Parse options
@@ -145,8 +167,9 @@ func main() {
 	lifetime := flag.Int("lifetime", 43200, "Session length in seconds")
 	secret := flag.String("secret", "", "*Secret used for signing (required)")
 	authHost := flag.String("auth-host", "", "Central auth login")
-	clientId := flag.String("client-id", "", "*Google Client ID (required)")
-	clientSecret := flag.String("client-secret", "", "*Google Client Secret (required)")
+	oidcIssuer := flag.String("oidc-issuer", "", "OIDC Issuer URL (required)")
+	clientId := flag.String("client-id", "", "Client ID (required)")
+	clientSecret := flag.String("client-secret", "", "Client Secret (required)")
 	cookieName := flag.String("cookie-name", "_forward_auth", "Cookie Name")
 	cSRFCookieName := flag.String("csrf-cookie-name", "_forward_auth_csrf", "CSRF Cookie Name")
 	cookieDomainList := flag.String("cookie-domains", "", "Comma separated list of cookie domains") //todo
@@ -169,8 +192,24 @@ func main() {
 	}
 
 	// Check for show stopper errors
-	if *clientId == "" || *clientSecret == "" || *secret == "" {
-		log.Fatal("client-id, client-secret and secret must all be set")
+	if *clientId == "" || *clientSecret == "" || *secret == "" || *oidcIssuer == "" {
+		log.Fatal("client-id, client-secret, secret and oidc-issuer must all be set")
+	}
+
+	var oidcParams = getOidcConfig(*oidcIssuer)
+
+	loginUrl, err := url.Parse((oidcParams["authorization_endpoint"].(string)))
+	if err != nil {
+		log.Fatal("unable to parse login url")
+	}
+
+	tokenUrl, err := url.Parse((oidcParams["token_endpoint"].(string)))
+	if err != nil {
+		log.Fatal("unable to parse token url")
+	}
+	userUrl, err := url.Parse((oidcParams["userinfo_endpoint"].(string)))
+	if err != nil {
+		log.Fatal("unable to parse user url")
 	}
 
 	// Parse lists
@@ -200,22 +239,11 @@ func main() {
 
 		ClientId:     *clientId,
 		ClientSecret: *clientSecret,
-		Scope:        "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
-		LoginURL: &url.URL{
-			Scheme: "https",
-			Host:   "accounts.google.com",
-			Path:   "/o/oauth2/auth",
-		},
-		TokenURL: &url.URL{
-			Scheme: "https",
-			Host:   "www.googleapis.com",
-			Path:   "/oauth2/v3/token",
-		},
-		UserURL: &url.URL{
-			Scheme: "https",
-			Host:   "www.googleapis.com",
-			Path:   "/oauth2/v2/userinfo",
-		},
+		Scope:        "profile email",
+
+		LoginURL: loginUrl,
+		TokenURL: tokenUrl,
+		UserURL:  userUrl,
 
 		CookieName:     *cookieName,
 		CSRFCookieName: *cSRFCookieName,
