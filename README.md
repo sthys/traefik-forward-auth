@@ -1,5 +1,53 @@
+[cookbookurl]: https://geek-cookbook.funkypenguin.co.nz
+[kitchenurl]: https://discourse.kitchen.funkypenguin.co.nz
+[discordurl]: http://chat.funkypenguin.co.nz
+[patreonurl]: https://patreon.com/funkypenguin
+[blogurl]: https://www.funkypenguin.co.nz
+[hub]: https://hub.docker.com/r/funkypenguin/poor-mans-k8s-lb/
 
-# Traefik Forward Auth [![Build Status](https://travis-ci.org/thomseddon/traefik-forward-auth.svg?branch=master)](https://travis-ci.org/thomseddon/traefik-forward-auth) [![Go Report Card](https://goreportcard.com/badge/github.com/thomseddon/traefik-forward-auth)](https://goreportcard.com/badge/github.com/thomseddon/traefik-forward-auth)
+[![geek-cookbook](https://raw.githubusercontent.com/funkypenguin/www.funkypenguin.co.nz/master/images/geek-kitchen-banner.png)][cookbookurl]
+
+# Contents
+
+1. [What is funkypenguin/poor-mans-k8s-lb?](#what-is-funkypenguin-poor-mans-k8s-lb)
+2. [Why should I use this?](#why-should-i-use-this)
+3. [How do I use it?](#how-do-i-use-this)
+4. [CHANGELOG](#changelog)
+
+---
+
+This container is maintained by [Funky Penguin's Geek Cookbook][cookbookurl], a collection of "recipes" to run popular applications
+on Docker Swarm or Kubernetes, in a cheeky, geek format.
+
+Got more details at:
+* ![Discourse with us!](https://img.shields.io/discourse/https/discourse.geek-kitchen.funkypenguin.co.nz/topics.svg) [Forums][kitchenurl]
+* ![Chat with us!](https://img.shields.io/discord/396055506072109067.svg) [Friendly Discord Chat][discordurl]
+* ![Geek out with us!](https://img.shields.io/badge/recipies-35+-brightgreen.svg) [Funky Penguin's Geek Cookbook][cookbookurl]
+* ![Thank YOU](https://img.shields.io/badge/thank-you-brightgreen.svg) [Patreon][patreonurl]
+* ![Read blog!](https://img.shields.io/badge/read-blog-brightgreen.svg) [Blog][blogurl]
+
+---
+
+# What is funkypenguin/traefik-forward-auth ?
+
+A fork of https://github.com/noelcatt/traefik-forward-auth, which is in turn a fork of https://github.com/thomseddon/traefik-forward-auth.
+
+Why all the forkery? @thomseddon's version supports only Google OIDC, while @noelcatt's version supports any OIDC, but doesn't have a docker image build pipeline setup. At some point, I hope thaht @thomseddon's version will be extended to support multiple OIDCs, but until then, I'll maintain my own copy.
+
+[![Build Status](https://travis-ci.org/funkypenguin/traefik-forward-auth.svg?branch=master)](https://travis-ci.org/funkypenguin/traefik-forward-auth) [![Go Report Card](https://goreportcard.com/badge/github.com/funkypenguin/traefik-forward-auth)](https://goreportcard.com/badge/github.com/funkypenguin/traefik-forward-auth)
+
+
+# Why should I use this?
+
+
+# How do I use this?
+
+# CHANGELOG
+
+# Upstream README
+
+
+# Traefik Forward Auth [![Build Status](https://travis-ci.org/funkypenguin/traefik-forward-auth.svg?branch=master)](https://travis-ci.org/funkypenguin/traefik-forward-auth) [![Go Report Card](https://goreportcard.com/badge/github.com/funkypenguin/traefik-forward-auth)](https://goreportcard.com/badge/github.com/funkypenguin/traefik-forward-auth)
 
 A minimal forward authentication service that provides Google oauth based login and authentication for the traefik reverse proxy.
 
