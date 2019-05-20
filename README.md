@@ -73,6 +73,7 @@ The following configuration is supported:
 |-client-id|string|*Google Client ID (required)|
 |-client-secret|string|*Google Client Secret (required)|
 |-secret|string|*Secret used for signing (required)|
+|-oidcIssuer|string|*OIDC Issuer URL (required)|
 |-config|string|Path to config file|
 |-auth-host|string|Central auth login (see below)|
 |-cookie-domains|string|Comma separated list of cookie domains (see below)|
