@@ -241,7 +241,7 @@ func main() {
 
 		ClientId:     *clientId,
 		ClientSecret: *clientSecret,
-		Scope:        "profile email",
+		Scope:        "openid profile email",
 
 		LoginURL: loginUrl,
 		TokenURL: tokenUrl,
